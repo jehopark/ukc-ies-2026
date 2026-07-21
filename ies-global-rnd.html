@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Global R&D Partnership & Networking Program — Company Directory</title>
+<style>
+  :root{
+    --ink:#101a24;
+    --paper:#eef1ea;
+    --card:#ffffff;
+    --line:#d8ddd0;
+    --accent:#b3542e;
+    --accent2:#1f6f5c;
+    --muted:#5b6a63;
+    --mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    --serif: 'Newsreader', 'Georgia', serif;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    background-image:
+      linear-gradient(180deg, #10202033 0%, transparent 12%),
+      repeating-linear-gradient(0deg, rgba(16,26,36,0.03) 0px, rgba(16,26,36,0.03) 1px, transparent 1px, transparent 42px);
+    color:var(--ink);
+    font-family:var(--sans);
+    padding: 0 0 80px 0;
+  }
+  header{
+    padding: 56px 6vw 36px 6vw;
+    border-bottom: 2px solid var(--ink);
+    position:relative;
+  }
+  .eyebrow{
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom: 18px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:26px;height:2px;background:var(--accent2);display:inline-block;
+  }
+  h1{
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(2.2rem, 5vw, 4rem);
+    line-height:1.02;
+    margin:0 0 18px 0;
+    letter-spacing: -0.01em;
+  }
+  h1 em{ font-style:italic; color:var(--accent); }
+  .sub{
+    max-width: 620px;
+    font-size: 16px;
+    line-height:1.55;
+    color: var(--muted);
+  }
+  .stats{
+    margin-top:28px;
+    display:flex;
+    gap: 36px;
+    flex-wrap:wrap;
+    font-family: var(--mono);
+  }
+  .stat b{ display:block; font-size: 28px; font-family: var(--serif); font-weight:600; color:var(--ink); }
+  .stat span{ font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); }
+
+  .toolbar{
+    padding: 22px 6vw 0 6vw;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  .toolbar .hint{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--muted);
+    letter-spacing:0.04em;
+    margin-right:8px;
+  }
+  .chip{
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing:0.03em;
+    border:1px solid var(--ink);
+    background:transparent;
+    color:var(--ink);
+    padding:6px 12px;
+    border-radius:999px;
+    cursor:pointer;
+    transition: all .15s ease;
+  }
+  .chip:hover{ background:var(--ink); color:var(--paper); }
+  .chip.active{ background:var(--accent2); border-color:var(--accent2); color:#fff; }
+
+  .grid{
+    margin-top: 30px;
+    padding: 0 6vw;
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 22px;
+  }
+
+  .card-wrap{ perspective: 1400px; height: 300px; }
+  .card-wrap.hidden{ display:none; }
+  .card{
+    position:relative;
+    width:100%; height:100%;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(.2,.7,.3,1.05);
+    cursor:pointer;
+  }
+  .card-wrap.flipped .card{ transform: rotateY(180deg); }
+
+  .face{
+    position:absolute; inset:0;
+    backface-visibility:hidden;
+    border:1.5px solid var(--ink);
+    border-radius:10px;
+    background:var(--card);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .front{
+    justify-content:space-between;
+    padding:18px;
+    box-shadow: 5px 5px 0 rgba(16,26,36,0.08);
+  }
+  .front .idx{
+    font-family:var(--mono);
+    font-size:10.5px;
+    color:var(--muted);
+    letter-spacing:0.06em;
+  }
+  .logo-zone{
+    flex:1;
+    display:flex; align-items:center; justify-content:center;
+    padding: 6px 4px;
+  }
+  .logo-zone img{
+    max-width:78%;
+    max-height:64px;
+    object-fit:contain;
+    filter: grayscale(0%);
+  }
+  .logo-fallback{
+    width:56px; height:56px; border-radius:50%;
+    background: var(--ink);
+    color: var(--paper);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--serif); font-weight:600; font-size:20px;
+  }
+  .front .name{
+    font-family: var(--serif);
+    font-weight:600;
+    font-size: 17px;
+    line-height:1.2;
+    margin-top: 8px;
+  }
+  .front .kr{
+    font-family: var(--sans);
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-top:2px;
+  }
+  .front .tags{
+    margin-top:10px;
+    display:flex; flex-wrap:wrap; gap:5px;
+  }
+  .tag{
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing:0.02em;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: #eceee3;
+    border: 1px solid var(--line);
+    color: var(--muted);
+  }
+  .front .flip-hint{
+    font-family:var(--mono);
+    font-size:10px;
+    color: var(--accent2);
+    text-align:right;
+    letter-spacing:0.04em;
+  }
+
+  .back{
+    transform: rotateY(180deg);
+    background: var(--ink);
+    color: var(--paper);
+    padding: 20px;
+    justify-content:space-between;
+  }
+  .back .name{
+    font-family: var(--serif);
+    font-weight:600;
+    font-size:16px;
+    margin-bottom:8px;
+    padding-bottom:8px;
+    border-bottom: 1px solid rgba(238,241,234,0.25);
+  }
+  .back .profile{
+    font-size: 12.3px;
+    line-height:1.5;
+    color: #cfd6cc;
+    overflow-y:auto;
+    flex:1;
+  }
+  .back .profile::-webkit-scrollbar{width:4px;}
+  .back .profile::-webkit-scrollbar-thumb{background:rgba(238,241,234,0.3);border-radius:4px;}
+  .back .site-row{
+    margin-top:10px;
+    padding-top:10px;
+    border-top: 1px solid rgba(238,241,234,0.25);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .back a.site{
+    font-family:var(--mono);
+    font-size:11px;
+    color: #f2b28f;
+    text-decoration:none;
+    letter-spacing:0.02em;
+  }
+  .back a.site:hover{ text-decoration:underline; }
+  .back .no-site{
+    font-family:var(--mono);
+    font-size:10.5px;
+    color:#7f8a80;
+  }
+  .back .flip-hint{
+    font-family:var(--mono);
+    font-size:10px;
+    color:#8b968d;
+  }
+
+  footer{
+    margin-top:60px;
+    padding: 24px 6vw 0 6vw;
+    font-family: var(--mono);
+    font-size:11px;
+    color: var(--muted);
+    border-top: 1px solid var(--line);
+    padding-top:18px;
+  }
+
+  @media (max-width: 480px){
+    .card-wrap{ height: 280px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">UKC 2026 &middot; Innovation &amp; Entrepreneurship Symposium</div>
+  <h1>Global R&amp;D Partnership &amp; Networking Program<br><em>Company Directory</em></h1>
+  <div class="sub">Twenty-two companies working across AI, biotech, robotics, advanced materials, and mobility &mdash; profiled from public filings, press coverage, and company sites. Flip each card for a short company profile.</div>
+  <div class="stats">
+    <div class="stat"><b>22</b><span>Companies</span></div>
+    <div class="stat"><b>8</b><span>Fields represented</span></div>
+  </div>
+</header>
+
+<div class="toolbar" id="toolbar">
+  <span class="hint">Filter:</span>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<footer>
+  Company details compiled from public sources (company sites, THE VC, PitchBook, Crunchbase, press coverage) &middot; July 2026. Some companies had no verifiable public website at time of research and are marked accordingly.
+</footer>
+
+<script>
+// 8 consolidated top-level fields used for filtering.
+// Each company keeps its detailed spreadsheet "tags" for the card front,
+// plus a short "fields" array (subset of FIELD_CATEGORIES) for the filter bar.
+const FIELD_CATEGORIES = [
+  "AI/ICT",
+  "Biotech & Pharma",
+  "Digital Healthcare",
+  "Robotics & Automation",
+  "SaaS & Platforms",
+  "Materials & Manufacturing",
+  "Aerospace & Mobility",
+  "Energy & Storage"
+];
+
+const companies = [
+  {
+    name: "StellarCube",
+    kr: "㈜스텔라큐브",
+    domain: "stellarcube.ai",
+    site: "stellarcube.ai",
+    tags: ["AI/ICT","Biotech","Digital Healthcare"],
+    fields: ["AI/ICT","Biotech & Pharma","Digital Healthcare"],
+    profile: "Seoul-based (Incheon) convergence-tech company spanning AI, data, XR and healthcare. Builds hyper-personalized AI personas, real-time urban data/GIS analytics, and digital-twin/XR content for smart-city, public-service, education and healthcare applications under its Stellar AX, Stellar Data and Stellar XR product lines."
+  },
+  {
+    name: "YOUTH BIO GLOBAL",
+    kr: "유쓰바이오글로벌",
+    domain: "youthbioglobal.com",
+    site: "en.youthbioglobal.com",
+    tags: ["Pharma","Biotech","Digital Healthcare"],
+    fields: ["Biotech & Pharma","Digital Healthcare"],
+    profile: "Founded 2017, headquartered in Cheongju, South Korea. Developer of the world's first xeno-free endothelial progenitor cell (EPC) therapy derived from human umbilical cord blood, targeting ischemic vascular diseases such as critical limb ischemia, diabetic foot ulcers, myocardial infarction and stroke."
+  },
+  {
+    name: "Curome Biosciences",
+    kr: "큐롬바이오사이언스",
+    domain: "curome.co.kr",
+    site: "www.curome.co.kr",
+    tags: ["Pharma"],
+    fields: ["Biotech & Pharma"],
+    profile: "Founded 2017 in Cheongju. Biotech venture developing mitochondrial-medicine drugs for rare and intractable diseases. Lead candidate HK-660S (raises intracellular NAD+) is in Phase 2 for primary sclerosing cholangitis and holds U.S. FDA fast-track designation; pipeline also includes the CR series of compounds."
+  },
+  {
+    name: "OZOMETA",
+    kr: "㈜오조메타",
+    domain: "ozometa.com",
+    site: "www.ozometa.com",
+    tags: ["AI/ICT","SaaS","Construction","Smart City"],
+    fields: ["AI/ICT","SaaS & Platforms","Materials & Manufacturing"],
+    profile: "Founded Dec. 2021 in Incheon (Songdo) with backing from Hana Bank and POSCO E&C affiliates. Runs Korea's first digital-twin-based FSCM (finance/supply-chain) B2B platform for construction, combining automated 3D modeling, quantity take-off and construction-linked supply-chain finance in an IFC-compatible SaaS system."
+  },
+  {
+    name: "BestTurn Inc.",
+    kr: "㈜베스턴",
+    domain: "bestturnaround.com",
+    site: "bestturnaround.com",
+    tags: ["AI/ICT","SaaS","SpotWork Marketplace"],
+    fields: ["AI/ICT","SaaS & Platforms"],
+    profile: "Founded Oct. 2023 by aviation-industry veterans. Builds a digital workforce-deployment platform that connects airport ground-handling staff and tasks in real time; selected for Incheon Airport's startup support program to help allocate work across roughly 90,000 airport-economy employees, starting with aircraft appearance/cleaning services."
+  },
+  {
+    name: "FLY TO Inc.",
+    kr: "㈜플라이투",
+    domain: null,
+    site: null,
+    tags: ["AI/ICT","SaaS","AAM","Aerospace Simulation & Digital Twin"],
+    fields: ["AI/ICT","SaaS & Platforms","Aerospace & Mobility"],
+    profile: "Founded and led by CEO Park Hae-jin. An aviation deep-tech startup building a proprietary 3D digital-twin flight-simulation engine spanning fixed-wing, rotary-wing and UAM (urban air mobility) aircraft &mdash; used for aircraft performance analysis, flight-operation simulation, and control/verification systems. Raised a Pre-A round from The Wells Investment via the Korea Impact Scale-up fund (with MYSC) in March 2026. A confidently matching public website could not be verified at time of research."
+  },
+  {
+    name: "SpeedFloor",
+    kr: "㈜스피드플로어",
+    domain: "speedfloor.co.kr",
+    site: "www.speedfloor.co.kr",
+    tags: ["Robotics","Logistics Automation"],
+    fields: ["Robotics & Automation"],
+    profile: "Founded Nov. 2021 in Incheon (Songdo). Makes an in-cargo-bay conveyor system that automates truck loading/unloading at the press of a button, cutting load times by 60%+ and physical strain by 30%+. Piloted with Lotte, LG, Kurly, Samsung and Korea Post; expanding to the U.S. via a partnership with MyTruckerPro."
+  },
+  {
+    name: "BioArchers",
+    kr: "바이오아처스",
+    domain: null,
+    site: null,
+    tags: ["Biotech"],
+    fields: ["Biotech & Pharma"],
+    profile: "Founded August 2024 by CEO Jung Jin-kyung (Seoul National University PhD, postdoc at Johns Hopkins Medical School). Developing NanoLink&trade;, an oral drug-delivery platform using 50&ndash;200nm mesoporous silica nanoparticles to carry peptide drugs like GLP-1 across the intestinal wall &mdash; aiming for a once-weekly oral GLP-1 pill. Team draws from Johns Hopkins, Celltrion and Korea's FDA; has signed NDAs with U.S. biotech firms. A confidently matching public website could not be verified at time of research."
+  },
+  {
+    name: "CAN-Therapy Inc.",
+    kr: "㈜캔-테라피",
+    domain: null,
+    site: null,
+    tags: ["Pharma","Biotech"],
+    fields: ["Biotech & Pharma"],
+    profile: "Founded Jan. 2022 by Dr. Shin Hyun-seok, a Korea University College of Medicine professor. Develops cancer and other disease therapeutics by recombining the strengths of existing approved drugs into new synthetic compounds. No public company website was located at time of research."
+  },
+  {
+    name: "DKMTech",
+    kr: "동강엠텍",
+    domain: "dkmtech.com",
+    site: "www.dkmtech.com",
+    tags: ["AI/ICT","Manufacturing"],
+    fields: ["AI/ICT","Materials & Manufacturing"],
+    profile: "Seoul-headquartered manufacturer (est. 1998) of press-formed metal components for home appliances, with R&D facilities integrating Big Data, AI and IoT into its production and quality-control processes across its Seoul, Busan, Gunsan and Daejeon sites."
+  },
+  {
+    name: "BeauBrain Healthcare",
+    kr: "뷰브레인헬스케어",
+    domain: "beaubrain.bio",
+    site: "beaubrain.bio",
+    tags: ["AI/ICT","Digital Healthcare"],
+    fields: ["AI/ICT","Digital Healthcare"],
+    profile: "Founded 2022 in Seoul by neurologists from Samsung Medical Center. Building an integrated early-Alzheimer's platform combining digital cognitive assessment, AI-based brain-image (PET/MRI) analysis, blood-biomarker algorithms (with C2N Diagnostics) and personalized cognitive-training digital therapeutics."
+  },
+  {
+    name: "LITIV Inc.",
+    kr: "㈜리티브",
+    domain: "litiv.net",
+    site: "www.litiv.net",
+    tags: ["AI/ICT","Digital Healthcare"],
+    fields: ["AI/ICT","Digital Healthcare"],
+    profile: "Founded Jan. 2022 in Daejeon. Computer-vision AI startup behind CourtLenz/Bastat, which turns smartphone video of basketball and indoor court sports into automated performance analytics and highlight extraction &mdash; aiming to 'democratize' sports-data access beyond pro-level teams."
+  },
+  {
+    name: "SoftPuzzle Inc.",
+    kr: "㈜소프트퍼즐",
+    domain: "softpuzzle.co.kr",
+    site: "www.softpuzzle.co.kr",
+    tags: ["AI/ICT","Robotics","SaaS","Pharma"],
+    fields: ["AI/ICT","Robotics & Automation","SaaS & Platforms","Biotech & Pharma"],
+    profile: "Seoul (Gasan Digital)-based IT development studio built around 'AI-first architecture' &mdash; LLM-based conversation/real-time event systems, scalable cloud-native platform engineering, and data/AI pipelines. Client work spans AI chatbots (Shinhan, KT AI Studio), AI big-data platforms, and IoT/robotics integrations (incl. ROS-based robot status monitoring), delivered as a technology partner across AI, IoT and Web projects."
+  },
+  {
+    name: "STRATIO, INC.",
+    kr: "스트라티오",
+    domain: "stratiokorea.com",
+    site: "www.stratiokorea.com",
+    tags: ["AI/ICT","Semiconductor"],
+    fields: ["AI/ICT","Materials & Manufacturing"],
+    profile: "Deep-tech company operating between Silicon Valley and Seoul, founded 2013 by Stanford EE PhDs. Built the world's first germanium-based short-wave infrared (SWIR) sensor and its 'Infrared-AI' platform (LinkSquare spectrometer, BeyonSense camera) for material identification &mdash; food safety, recycling sorting, narcotics/explosives detection."
+  },
+  {
+    name: "ROSAIC Co., Ltd.",
+    kr: "㈜로사익",
+    domain: null,
+    site: null,
+    tags: ["AI/ICT","Robotics"],
+    fields: ["AI/ICT","Robotics & Automation"],
+    profile: "Listed in the AI/ICT and robotics fields per its submitted company profile. No verifiable public website was located at time of research."
+  },
+  {
+    name: "BEI Co., Ltd.",
+    kr: "㈜비이아이 (구 비이아이랩)",
+    domain: "beilab.ai",
+    site: "beilab.ai",
+    tags: ["AI/ICT","Battery / Energy Storage","Advanced Materials"],
+    fields: ["Energy & Storage","Materials & Manufacturing"],
+    profile: "Founded Oct. 2020 (originally 'BEI Lab') in Ansan, led by CEO Bae Chang-deuk. South Korea's only next-gen lithium-metal battery maker: replaces the graphite anode with a lithium-metal foil and proprietary electrolyte, halving weight and roughly doubling energy density (500Wh/kg) versus lithium-ion, while retaining 96% performance at -20&deg;C. Partnered with POSCO Future M and Kumho Petrochemical on anode-free lithium-metal batteries; drone-battery field tests with military units underway, pilot production live in Ansan, IPO targeted for 2027."
+  },
+  {
+    name: "Samyang Comtech Co., Ltd.",
+    kr: "㈜삼양컴텍",
+    domain: "samyangct.com",
+    site: "samyangct.com/eng",
+    tags: ["Ceramic material","Engineering ceramics","Ballistic ceramics"],
+    fields: ["Materials & Manufacturing"],
+    profile: "Founded 1962 in Seoul; listed on KOSDAQ in 2025. South Korea's designated ballistic-protection manufacturer, producing silicon-carbide ceramic and Dyneema-based body armor, combat helmets and composite armor for K1/K2 tanks, plus composite components for aircraft and satellites."
+  },
+  {
+    name: "innobase co., ltd.",
+    kr: "㈜이노베이스",
+    domain: "innobase1.com",
+    site: "www.innobase1.com/en",
+    tags: ["AI/ICT","SaaS"],
+    fields: ["AI/ICT","SaaS & Platforms"],
+    profile: "Based in Asan, South Korea. Mobility-intelligence company combining proprietary IoT hardware with an AI-driven fleet management system (FMS) SaaS platform &mdash; real-time location, routing and impact-event tracking, plus AI-powered carbon-emissions reporting for ESG compliance."
+  },
+  {
+    name: "Nextron Corporation",
+    kr: "㈜넥스트론",
+    domain: "microprobesystem.com",
+    site: "www.microprobesystem.com",
+    tags: ["SaaS","Electric Measurement"],
+    fields: ["Materials & Manufacturing"],
+    profile: "Founded 2007 in Busan. Designs and manufactures compact research equipment &mdash; micro probe stations, environmental controllers, and mass-flow/vacuum/humidity/temperature controllers &mdash; used to analyze the electrical and optical properties of materials for semiconductor, display and research customers worldwide."
+  },
+  {
+    name: "Nextron",
+    kr: "",
+    domain: null,
+    site: null,
+    tags: ["hidden"],
+    profile: "placeholder",
+    hidden: true
+  },
+  {
+    name: "ANPOLY",
+    kr: "㈜에이엔폴리",
+    domain: "anpolyinc.com",
+    site: "anpolyinc.com",
+    tags: ["Biotech","Pharma"],
+    fields: ["Biotech & Pharma","Materials & Manufacturing"],
+    profile: "Based in Pohang (POSTECH), South Korea. Synthetic-biology company commercializing nanocellulose and nanochitin biopolymers made from discarded pulp and crab-shell waste, supplying eco-friendly, high-performance materials to plastics and other manufacturers as sustainable substitutes."
+  },
+  {
+    name: "ESOL",
+    kr: "㈜이솔",
+    domain: null,
+    site: null,
+    tags: ["AI/ICT","Robotics","Digital Healthcare","Ultra-precision stage control","Digital twin for PHM"],
+    fields: ["AI/ICT","Robotics & Automation","Digital Healthcare"],
+    profile: "Listed as working on ultra-precision stage control and digital-twin technology for prognostics and health management (PHM), spanning robotics x AI and robotics x digital-healthcare applications, per its submitted profile. A confidently matching public website could not be identified &mdash; several similarly named Korean firms exist."
+  },
+  {
+    name: "ELCYCER Co., Ltd",
+    kr: "㈜엘사이서",
+    domain: "elcycer.co.kr",
+    site: "www.elcycer.co.kr",
+    tags: ["AI / ICT","Alloy design","Metal AM"],
+    fields: ["AI/ICT","Materials & Manufacturing","Aerospace & Mobility"],
+    profile: "South Korean advanced-materials company applying AI to alloy design, metal additive manufacturing (3D printing) and repair technologies &mdash; active in industry discussion around binder-jet, DED and WAAM metal-AM processes for stainless steel, nickel and titanium alloys, with reach into digital manufacturing, aerospace, defense and energy."
+  }
+];
+
+// remove placeholder hidden entry, then sort alphabetically by name
+const data = companies.filter(c => !c.hidden).sort((a, b) => a.name.localeCompare(b.name));
+
+function initials(name){
+  return name.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+}
+
+function logoUrl(domain){
+  if(!domain) return null;
+  return `https://logo.clearbit.com/${domain}?size=160`;
+}
+
+const grid = document.getElementById('grid');
+
+data.forEach((c, i) => {
+  const wrap = document.createElement('div');
+  wrap.className = 'card-wrap';
+  wrap.dataset.fields = c.fields.join('|').toLowerCase();
+
+  const card = document.createElement('div');
+  card.className = 'card';
+
+  const front = document.createElement('div');
+  front.className = 'face front';
+
+  const logoZone = document.createElement('div');
+  logoZone.className = 'logo-zone';
+  if(c.domain){
+    const img = document.createElement('img');
+    img.src = logoUrl(c.domain);
+    img.alt = c.name + ' logo';
+    img.onerror = () => {
+      logoZone.innerHTML = '';
+      const fb = document.createElement('div');
+      fb.className = 'logo-fallback';
+      fb.textContent = initials(c.name);
+      logoZone.appendChild(fb);
+    };
+    logoZone.appendChild(img);
+  } else {
+    const fb = document.createElement('div');
+    fb.className = 'logo-fallback';
+    fb.textContent = initials(c.name);
+    logoZone.appendChild(fb);
+  }
+
+  front.innerHTML = `<div class="idx">${String(i+1).padStart(2,'0')} / ${String(data.length).padStart(2,'0')}</div>`;
+  front.appendChild(logoZone);
+  const nameBlock = document.createElement('div');
+  nameBlock.innerHTML = `<div class="name">${c.name}</div><div class="kr">${c.kr||''}</div>
+    <div class="tags">${c.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>`;
+  front.appendChild(nameBlock);
+  const hint = document.createElement('div');
+  hint.className = 'flip-hint';
+  hint.textContent = 'tap for profile ⟳';
+  front.appendChild(hint);
+
+  const back = document.createElement('div');
+  back.className = 'face back';
+  back.innerHTML = `
+    <div>
+      <div class="name">${c.name}</div>
+      <div class="profile">${c.profile}</div>
+    </div>
+    <div class="site-row">
+      ${c.site ? `<a class="site" href="https://${c.site.replace(/^https?:\/\//,'')}" target="_blank" rel="noopener">${c.site} ↗</a>` : `<span class="no-site">no verified site</span>`}
+      <span class="flip-hint">⟲ back</span>
+    </div>
+  `;
+
+  card.appendChild(front);
+  card.appendChild(back);
+  wrap.appendChild(card);
+  grid.appendChild(wrap);
+
+  wrap.addEventListener('click', (e) => {
+    if(e.target.closest('a')) return;
+    wrap.classList.toggle('flipped');
+  });
+});
+
+// filter chips — built from the 8 consolidated fields, not the raw per-company tags
+const toolbar = document.getElementById('toolbar');
+const allChip = document.createElement('button');
+allChip.className = 'chip active';
+allChip.textContent = 'All';
+allChip.onclick = () => setFilter(null, allChip);
+toolbar.appendChild(allChip);
+
+FIELD_CATEGORIES.forEach(field => {
+  const chip = document.createElement('button');
+  chip.className = 'chip';
+  chip.textContent = field;
+  chip.onclick = () => setFilter(field.toLowerCase(), chip);
+  toolbar.appendChild(chip);
+});
+
+function setFilter(field, activeChip){
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  activeChip.classList.add('active');
+  document.querySelectorAll('.card-wrap').forEach(w => {
+    if(!field || w.dataset.fields.includes(field)){
+      w.classList.remove('hidden');
+    } else {
+      w.classList.add('hidden');
+    }
+  });
+}
+</script>
+</body>
+</html>
